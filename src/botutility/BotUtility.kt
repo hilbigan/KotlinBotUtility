@@ -442,10 +442,10 @@ fun Point.str(): String {
 
 private fun String.regexTitle(): String = "[REGEXPTITLE:$this]"
 
-@Suppress("NAME_SHADOWING")
 /**
  * https://de.wikipedia.org/wiki/Bresenham-Algorithmus
  */
+@Suppress("NAME_SHADOWING")
 private fun line(x0: Int, y0: Int, x1: Int, y1: Int): List<Point> {
     var x0 = x0
     var y0 = y0
@@ -482,6 +482,7 @@ fun highlightArea(x: Int, y: Int, w: Int, h: Int) {
 
 private var drawnAlphaWindows: MutableList<JFrame> = mutableListOf()
 private val array = Array(1920 * 1080) { i -> 0xFF0000 }
+
 /**
  * Display a transparent window with the given bounds. The colArray represents a lookup table for every pixel color in
  * the highlighted area.
