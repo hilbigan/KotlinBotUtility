@@ -16,6 +16,7 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 
 /**
+ * Provides various functionality to simulate or recieve user input.
  * @author Aaron Hilbig
  */
 object Bot {
@@ -41,7 +42,7 @@ object Bot {
 
     /**
      * Sets the coordinate mode to "windowed".<br>
-     * Every coordinate point will be offset relative to this window's position from this point on
+     * Every coordinate point will be offset relative to this window's position from this point on.
      */
     fun coordinateModeWindow(titleRegex: String, offsetFromWindow: Point = Point(0,0)) {
         offsetWindowTitle = titleRegex
@@ -74,42 +75,74 @@ object Bot {
         }
     }
 
+    /**
+     * Wait for the java.awt.Robot to finish it's last action.
+     */
     fun waitFor() = robot.waitForIdle()
 
+    /**
+     * Returns the current mouse position.
+     */
     fun getMousePosition(): Point = MouseInfo.getPointerInfo().location.dcoord()
 
+    /**
+     * Simulates a left click with the mouse.
+     */
     fun leftClick() {
         robot.mousePress(InputEvent.BUTTON1_MASK)
         robot.mouseRelease(InputEvent.BUTTON1_MASK)
     }
 
+    /**
+     * Presses and holds the left mouse button.
+     */
     fun leftClickHold() {
         robot.mousePress(InputEvent.BUTTON1_MASK)
     }
 
+    /**
+     * Releases the left mouse button.
+     */
     fun leftClickRelease() {
         robot.mouseRelease(InputEvent.BUTTON1_MASK)
     }
 
+    /**
+     * Simulates a right click with the mouse.
+     */
     fun rightClick() {
         robot.mousePress(InputEvent.BUTTON3_MASK)
         robot.mouseRelease(InputEvent.BUTTON3_MASK)
     }
 
+    /**
+     * Moves the mouse to the specified point and left-clicks.
+     */
     fun click(p: Point){
         moveMouse(p.x, p.y)
         leftClick()
     }
 
+    /**
+     * Moves the mouse to the specified point and left-clicks.
+     */
     fun click(x: Int, y: Int){
         moveMouse(x, y)
         leftClick()
     }
 
+    /**
+     * Moves the mouse to the specified point. If the delay is greater than zero, the mouse will move smoothly along a
+     * direct path to the given point.
+     */
     fun moveMouse(p: Point, delay: Int = 0) {
         moveMouse(p.x, p.y, delay)
     }
 
+    /**
+     * Moves the mouse to the specified point. If the delay is greater than zero, the mouse will move smoothly along a
+     * direct path to the given point.
+     */
     fun moveMouse(x: Int, y: Int, delay: Int = 0) {
         val (xx, yy) = Point(x,y).coord()
 
@@ -126,10 +159,18 @@ object Bot {
         robot.autoDelay = 10
     }
 
+    /**
+     * Moves the mouse to the specified point relative to the current mouse position. If the delay is greater than zero, the mouse will move smoothly along a
+     * direct path to the given point.
+     */
     fun moveMouseRelative(p: Point, delay: Int = 0) {
         moveMouseRelative(p.x, p.y, delay)
     }
 
+    /**
+     * Moves the mouse to the specified point relative to the current mouse position. If the delay is greater than zero, the mouse will move smoothly along a
+     * direct path to the given point.
+     */
     fun moveMouseRelative(x: Int, y: Int, delay: Int = 0) {
         val mousePos = getMousePosition()
 
@@ -146,56 +187,95 @@ object Bot {
         robot.autoDelay = 10
     }
 
+    /**
+     * Uses AutoIT's "controlClick" function to simulate a click on something inside a window
+     * without actually moving or controlling the mouse.
+     */
     fun controlClick(x: Int, y: Int, titleRegex: String = "") {
         val (xx, yy) = Point(x,y).coord()
         ait.controlClick("[REGEXPTITLE:$titleRegex]", "", "", "Left", 1, xx, yy)
     }
 
+    /**
+     * Uses AutoIT's "controlClick" function to simulate a click on something inside a window
+     * without actually moving or controlling the mouse.
+     */
     fun controlClick(p: Point, titleRegex: String = "") {
         controlClick(p.x, p.y, titleRegex)
     }
 
+    /**
+     * Types the given text.
+     */
     fun type(text: String) {
         ait.send(text, true)
     }
 
+    /**
+     * Presses and holds the given key.
+     */
     fun pressKey(e: KeyEvent) {
         robot.keyPress(e.keyCode)
     }
 
+    /**
+     * Releases the given key.
+     */
     fun releaseKey(e: KeyEvent) {
         robot.keyRelease(e.keyCode)
     }
 
+    /**
+     * Checks and returns wether a program with the given title (regex) is running.
+     */
     fun isProgramRunning(titleRegex: String): Boolean {
         val gameHandle = ait.winGetHandle("[REGEXPTITLE:$titleRegex]")
         return Integer.parseInt(gameHandle.substring(2), 16) != 0
     }
 
+    /**
+     * Focuses the window with the given title (regex).
+     */
     fun focusWindow(titleRegex: String) {
         ait.winActivate("[REGEXPTITLE:$titleRegex]")
     }
 
+    /**
+     * Returns the calculated pixel checksum of the given area.
+     */
     fun getPixelChecksum(x: Int, y: Int, w: Int, h: Int): Double {
         val (xx, yy) = Point(x,y).coord()
         return ait.pixelChecksum(xx, yy, xx + w, yy + h)
     }
 
+    /**
+     * Returns the calculated pixel checksum of the given area.
+     */
     fun getPixelChecksum(p: Point, w: Int, h: Int): Double {
         val (xx, yy) = Point(p.x,p.y).coord()
         return ait.pixelChecksum(xx, yy, xx + w, yy + h)
     }
 
+    /**
+     * Returns the specified pixels color.
+     */
     fun getPixelColor(x: Int, y: Int): Color {
         val (xx, yy) = Point(x,y).coord()
         return robot.getPixelColor(xx, yy)
     }
 
+    /**
+     * Returns the specified pixels color.
+     */
     fun getPixelColor(p: Point): Color {
         val (xx, yy) = Point(p.x,p.y).coord()
         return robot.getPixelColor(xx, yy)
     }
 
+    /**
+     * Finds the first pixel with the given color and given shade variation (default: 5)
+     * in the specified area (default: full screen)
+     */
     fun findPixelColor(color: Int, shadeVariation: Int = 5, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080): Point {
         val (xx, yy) = Point(x,y).coord()
 
@@ -204,6 +284,11 @@ object Bot {
         return Point(coord[0].toInt(), coord[1].toInt()).dcoord()
     }
 
+    /**
+     * Executes the given block of code in a new thread. If any of the pixels in the specified area change, the thread
+     * will be joined or stopped (depending on wether threadStop is true).
+     * updateDelayMs determines the delay between checks and thereby the accuracy and reaction time.
+     */
     fun untilPixelsChanged(x: Int, y: Int, w: Int = 1, h: Int = 1, updateDelayMs: Int = 5, threadStop: Boolean = false, block: Bot.() -> Unit) {
         val startPixels = getPixelChecksum(x, y, w, h)
         val thread = Thread {
@@ -217,6 +302,11 @@ object Bot {
         else thread.join()
     }
 
+    /**
+     * Executes the given block of code in a new thread. If the given pixel changes to the given color, the thread
+     * will be joined or stopped (depending on wether threadStop is true).
+     * updateDelayMs determines the delay between checks and thereby the accuracy and reaction time.
+     */
     fun untilPixelHasColor(x: Int, y: Int, color: Color, updateDelayMs: Int = 5, threadStop: Boolean = false, block: Bot.() -> Unit) {
         val thread = Thread {
             block.invoke(this)
@@ -229,10 +319,19 @@ object Bot {
         else thread.join()
     }
 
+    /**
+     * Executes the given block of code in a new thread. If the given pixel changes to the given color, the thread
+     * will be joined or stopped (depending on wether threadStop is true).
+     * updateDelayMs determines the delay between checks and thereby the accuracy and reaction time.
+     */
     fun untilPixelHasColor(p: Point, color: Color, updateDelayMs: Int = 5, threadStop: Boolean = false, block: Bot.() -> Unit) {
         untilPixelHasColor(p.x, p.y, color, updateDelayMs, threadStop, block)
     }
 
+    /**
+     * Executes the given block of code in a new thread. If the given key is pressed, the thread
+     * will be joined or stopped (depending on wether threadStop is true).
+     */
     fun untilKeyPressed(nativeKeyCode: Int, updateDelayMs: Int = 5, block: Bot.() -> Unit) {
         Hotkey.instance.activate()
         var pressed = false
@@ -248,6 +347,9 @@ object Bot {
         }
     }
 
+    /**
+     * Executes the given block of code in a new thread every time the given key is pressed.
+     */
     fun onKeyPressed(nativeKeyCode: Int, block: () -> Unit) {
         Hotkey.instance.activate()
         Hotkey.instance.addHotkey(Hotkey.TRIGGER_TYPE.TYPED, { e ->
@@ -256,6 +358,9 @@ object Bot {
     }
 
     /**
+     * Executes the given block of code in a new thread. If the given image found in the search space, the thread
+     * will be joined or stopped (depending on wether threadStop is true).
+     * updateDelayMs determines the delay between checks and thereby the accuracy and reaction time.
      * Use longer updateDelayMs (e.g. 100) to avoid image detection in transition animations etc.
      */
     fun untilImageFound(pathToImage: File, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080, updateDelayMs: Int = 5, threadStop: Boolean = false, block: Bot.() -> Unit): Point {
@@ -281,18 +386,30 @@ object Bot {
         return point
     }
 
+    /**
+     * Returns the top left position of a window with the given title (regex)
+     */
     fun getPositionOfWindow(titleRegex: String): Point {
         return Point(ait.winGetPosX(titleRegex.regexTitle()), ait.winGetPosY(titleRegex.regexTitle()))
     }
 
+    /**
+     * Returns the dimensions (w,h) of a window with the given title (regex)
+     */
     fun getDimensionOfWindow(titleRegex: String): Point {
         return Point(ait.winGetPosWidth(titleRegex.regexTitle()), ait.winGetPosHeight(titleRegex.regexTitle()))
     }
 
+    /**
+     * Returns the title of the currently active (focused) window.
+     */
     fun getActiveWindow(): String {
         return ait.winGetTitle("[ACTIVE]")
     }
 
+    /**
+     * Checks if a program with the specified title (regex) is running and otherwise terminates
+     */
     fun assertRunning(titleRegex: String) {
         if (!isProgramRunning(titleRegex)) {
             println("Process: $titleRegex not found, please start it first!")
@@ -300,6 +417,10 @@ object Bot {
         }
     }
 
+    /**
+     * Searches for the given image in the given search space (default: full screen) and returns it's coordinates
+     * if found, otherwise (-1,-1)
+     */
     fun searchImage(pathToImage: File, x: Int = -1, y: Int = -1, w: Int = -1, h: Int = -1): Point {
         if (x != -1 && y != -1 && w != -1 && h != -1) {
             val (xx, yy) = Point(x, y).coord()
@@ -307,12 +428,11 @@ object Bot {
         } else
             return ScreenSearcher().search(pathToImage)
     }
-
-    /*fun Point.toPointInWindow(titleRegex: String, xOffset: Int = 0, yOffset: Int = 0): Point {
-        val posOfWin = getPositionOfWindow(titleRegex)
-        return Point(this.x + posOfWin.x + xOffset, this.y + posOfWin.y + yOffset)
-    }*/
 }
+
+/*
+ * Extension functions for java.awt.Point
+ */
 
 operator fun Point.component1() = this.x
 operator fun Point.component2() = this.y
@@ -320,10 +440,13 @@ fun Point.str(): String {
     return "($x,$y)"
 }
 
-fun String.regexTitle(): String = "[REGEXPTITLE:$this]"
+private fun String.regexTitle(): String = "[REGEXPTITLE:$this]"
 
 @Suppress("NAME_SHADOWING")
-private  fun line(x0: Int, y0: Int, x1: Int, y1: Int): List<Point> {
+/**
+ * https://de.wikipedia.org/wiki/Bresenham-Algorithmus
+ */
+private fun line(x0: Int, y0: Int, x1: Int, y1: Int): List<Point> {
     var x0 = x0
     var y0 = y0
     val ret = ArrayList<Point>()
@@ -350,15 +473,22 @@ private  fun line(x0: Int, y0: Int, x1: Int, y1: Int): List<Point> {
     return ret
 }
 
+/**
+ * Highlights the specified area in red.
+ */
 fun highlightArea(x: Int, y: Int, w: Int, h: Int) {
     drawAlphaWindow(x = x, y = y, w = w, h = h)
 }
 
 private var drawnAlphaWindows: MutableList<JFrame> = mutableListOf()
 private val array = Array(1920 * 1080) { i -> 0xFF0000 }
-fun drawAlphaWindow(bitArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080, colalpha: Int = 128) {
+/**
+ * Display a transparent window with the given bounds. The colArray represents a lookup table for every pixel color in
+ * the highlighted area.
+ */
+fun drawAlphaWindow(colArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080, colalpha: Int = 128) {
 
-    assert(bitArray.size == w * h)
+    assert(colArray.size == w * h)
 
     try {
         val c = Class.forName("com.sun.awt.AWTUtilities");
@@ -402,8 +532,8 @@ fun drawAlphaWindow(bitArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int
             //g2d.drawString("HALLO",0,0)
             for (xx in 0 until w)
                 for (yy in 0 until h)
-                    if (bitArray[xx + yy * h] != 0) {
-                        val col = bitArray[xx + yy * h]
+                    if (colArray[xx + yy * h] != 0) {
+                        val col = colArray[xx + yy * h]
                         g2d.color = Color(col and 0xFF0000 shr 16, col and 0x00FF00 shr 8, col and 0x0000FF, colalpha)
                         g2d.fillRect(xx, yy, 1, 1)
                     }
