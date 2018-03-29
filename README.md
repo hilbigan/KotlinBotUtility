@@ -15,7 +15,7 @@ fun main(args: Array<String>){
 **Interacting with programs:**
 ```kotlin
 with(Bot){
-  //Checks if a program with the specified title is running and otherwise terminates
+  //Checks if a program with the specified title (regex) is running and otherwise terminates
   assertRunning(".?*Chrome")
 
   //Focus window with the specified title
