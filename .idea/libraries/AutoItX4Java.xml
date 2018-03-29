@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="AutoItX4Java">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/AutoItX4Java.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/JNativeHook.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/sikuli-api-1.0.2-standalone.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jacob.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
