@@ -1,6 +1,11 @@
 # KotlinBotUtility
-Wrapper for java.awt.Robot and AutoItXJava to provide easily accessible functionality to create bots for windows.
+Wrapper for java.awt.Robot and [AutoItXJava](https://github.com/accessrichard/autoitx4java) to provide easily accessible functionality to create bots for windows.
 See examples for an example application.
+You need to either install AutoIt or download it's portable version and register it using
+```
+regsvr32.exe AutoItX3.dll
+```
+
 
 **Minimal Example:**
 ```kotlin
