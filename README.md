@@ -35,3 +35,17 @@ with(Bot){
 }
 ```
 
+**Other cool stuff:**
+```kotlin
+with(Bot){
+  onKeyPressed(NativeKeyEvent.VC_ENTER){ //Executes when 'Enter' is pressed
+    //Left-Clicks on 150,150 every second until the pixel at 100,100 is red.
+    untilPixelHasColor(100,100,Color(0xFF0000), threadStop = true){
+      while(true){ click(150,150); sleep(1000) }
+    }
+    
+    //...and then types some text
+    type("some text")
+  }
+}
+```
