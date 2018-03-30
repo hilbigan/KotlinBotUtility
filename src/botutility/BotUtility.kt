@@ -428,6 +428,17 @@ object Bot {
         } else
             return ScreenSearcher().search(pathToImage)
     }
+
+    /**
+     * Opens the given filename/executable and optionally waits.
+     */
+    fun run(filename: String, wait: Boolean = false, workDir: String? = null){
+        if(!wait){
+            if(workDir == null) ait.run(filename) else ait.run(filename, workDir)
+        } else {
+            if(workDir == null) ait.runWait(filename) else ait.runWait(filename, workDir)
+        }
+    }
 }
 
 /*
