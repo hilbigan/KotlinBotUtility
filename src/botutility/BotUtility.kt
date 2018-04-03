@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.io.File
 import java.lang.Math.abs
+import java.lang.Thread.interrupted
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -155,6 +156,11 @@ object Bot {
         for (p in line(getMousePosition().x, getMousePosition().y, xx, yy)) {
             robot.mouseMove(p.x, p.y)
             robot.delay(delay)
+            if(Thread.currentThread().isInterrupted){
+                moveMouse(xx, yy)
+                robot.autoDelay = 10
+                return
+            }
         }
         robot.autoDelay = 10
     }
