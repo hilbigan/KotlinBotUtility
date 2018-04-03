@@ -79,6 +79,7 @@ public class Hotkey implements NativeKeyListener {
         LogManager.getLogManager().reset();
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
+        logger.setUseParentHandlers(false);
     }
 
     /**

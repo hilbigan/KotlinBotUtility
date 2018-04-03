@@ -6,7 +6,6 @@ import helper.Hotkey
 import helper.ScreenSearcher
 import java.awt.*
 import java.awt.event.InputEvent
-import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.io.File
@@ -14,6 +13,7 @@ import java.lang.Math.abs
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
+import kotlin.NoSuchElementException
 
 /**
  * Provides various functionality to simulate or recieve user input.
@@ -193,7 +193,11 @@ object Bot {
      */
     fun controlClick(x: Int, y: Int, titleRegex: String = "") {
         val (xx, yy) = Point(x,y).coord()
-        ait.controlClick("[REGEXPTITLE:$titleRegex]", "", "", "Left", 1, xx, yy)
+        ait.controlClick(titleRegex.toRegexTitle(), "", "", "Left", 1, xx, yy)
+    }
+
+    fun controlType(text: String, titleRegex: String = "") {
+        ait.controlSend(titleRegex.toRegexTitle(), "", "", text)
     }
 
     /**
@@ -212,25 +216,47 @@ object Bot {
     }
 
     /**
-     * Presses and holds the given key.
+     * Presses all given key(s) at the same time and then releases them all at the same time.<br>
+     * Useful for single keystrokes, e.g.: <br><code>typeKey(KeyEvent.VK_ENTER)</code> but especially for<br>
+     * combinations, e.g.: <br><code>typeKey(KeyEvent.VK_WINDOWS, KeyEvent.VK_R)</code>
+     * @see java.awt.event.KeyEvent
      */
-    fun pressKey(e: KeyEvent) {
-        robot.keyPress(e.keyCode)
+    fun typeKey(vararg keyCodes: Int){
+        for(k in keyCodes)
+            pressKey(k)
+        for(k in keyCodes)
+            releaseKey(k)
+    }
+
+    /**
+     * Presses and holds the given key.
+     * @see java.awt.event.KeyEvent
+     */
+    fun pressKey(keyCode: Int) {
+        robot.keyPress(keyCode)
     }
 
     /**
      * Releases the given key.
+     * @see java.awt.event.KeyEvent
      */
-    fun releaseKey(e: KeyEvent) {
-        robot.keyRelease(e.keyCode)
+    fun releaseKey(keyCode: Int) {
+        robot.keyRelease(keyCode)
     }
 
     /**
      * Checks and returns wether a program with the given title (regex) is running.
      */
     fun isProgramRunning(titleRegex: String): Boolean {
-        val gameHandle = ait.winGetHandle("[REGEXPTITLE:$titleRegex]")
-        return Integer.parseInt(gameHandle.substring(2), 16) != 0
+        val hndl = ait.winGetHandle("[REGEXPTITLE:$titleRegex]")
+        return Integer.parseInt(hndl.substring(2), 16) != 0
+    }
+
+    /**
+     * Returns wether a process with the given name exists.
+     */
+    fun isProcessExists(procName: String): Boolean {
+        return ait.processExists(procName) != 0
     }
 
     /**
@@ -331,6 +357,7 @@ object Bot {
     /**
      * Executes the given block of code in a new thread. If the given key is pressed, the thread
      * will be joined or stopped (depending on wether threadStop is true).
+     * @see org.jnativehook.keyboard.NativeKeyEvent
      */
     fun untilKeyPressed(nativeKeyCode: Int, updateDelayMs: Int = 5, block: Bot.() -> Unit) {
         Hotkey.instance.activate()
@@ -349,6 +376,7 @@ object Bot {
 
     /**
      * Executes the given block of code in a new thread every time the given key is pressed.
+     * @see org.jnativehook.keyboard.NativeKeyEvent
      */
     fun onKeyPressed(nativeKeyCode: Int, block: () -> Unit) {
         Hotkey.instance.activate()
@@ -390,14 +418,14 @@ object Bot {
      * Returns the top left position of a window with the given title (regex)
      */
     fun getPositionOfWindow(titleRegex: String): Point {
-        return Point(ait.winGetPosX(titleRegex.regexTitle()), ait.winGetPosY(titleRegex.regexTitle()))
+        return Point(ait.winGetPosX(titleRegex.toRegexTitle()), ait.winGetPosY(titleRegex.toRegexTitle()))
     }
 
     /**
      * Returns the dimensions (w,h) of a window with the given title (regex)
      */
     fun getDimensionOfWindow(titleRegex: String): Point {
-        return Point(ait.winGetPosWidth(titleRegex.regexTitle()), ait.winGetPosHeight(titleRegex.regexTitle()))
+        return Point(ait.winGetPosWidth(titleRegex.toRegexTitle()), ait.winGetPosHeight(titleRegex.toRegexTitle()))
     }
 
     /**
@@ -408,11 +436,37 @@ object Bot {
     }
 
     /**
+     * Returns the title of the given process' window, if it has one.<br>
+     * Useful for programs that change their title constantly, but an expensive operation.<br>
+     * @throws NoSuchElementException if the process or no window was found
+     */
+    fun getTitleByProcess(procName: String): String {
+        ait.winList(".*?".toRegexTitle()).forEach {
+            return it.filter { !it.isNullOrEmpty() }.first {
+                try {
+                    ait.winGetProcess(it).toInt() == ait.processExists(procName)
+                } catch(e: Exception){ false }
+            }
+        }
+        throw NoSuchElementException("Unknown process / process not found: $procName")
+    }
+
+    /**
      * Checks if a program with the specified title (regex) is running and otherwise terminates
      */
     fun assertRunning(titleRegex: String) {
         if (!isProgramRunning(titleRegex)) {
-            println("Process '$titleRegex' not found, please start it first!")
+            println("Window with title '$titleRegex' not found, please start it first!")
+            System.exit(1)
+        }
+    }
+
+    /**
+     * Checks if a process with the specified name exists and otherwise terminates
+     */
+    fun assertProcessPresent(procName: String){
+        if(ait.processExists(procName) == 0){
+            println("Process '$procName' not found, please start it first!")
             System.exit(1)
         }
     }
@@ -455,7 +509,7 @@ fun Point.str(): String {
     return "($x,$y)"
 }
 
-private fun String.regexTitle(): String = "[REGEXPTITLE:$this]"
+private fun String.toRegexTitle(): String = "[REGEXPTITLE:$this]"
 
 /**
  * https://de.wikipedia.org/wiki/Bresenham-Algorithmus

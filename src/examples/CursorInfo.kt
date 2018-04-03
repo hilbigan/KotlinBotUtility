@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
         onKeyPressed(NativeKeyEvent.VC_C){
             pos1 = getMousePosition()
             val col = getPixelColor(pos1)
-            println("Mouse Position: " + pos1.str() + " - Color: ${col.red},${col.green},${col.blue}")
+            println((if(relative) "(rel) " else "(abs) ") + "Mouse Position: " + pos1.str() + " - Color: ${col.red},${col.green},${col.blue}")
         }
         onKeyPressed(NativeKeyEvent.VC_V){
             pos2 = getMousePosition()
