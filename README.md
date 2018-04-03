@@ -21,14 +21,14 @@ fun main(args: Array<String>){
 ```kotlin
 with(Bot){
   //Checks if a program with the specified title (regex) is running and otherwise terminates
-  assertRunning(".?*Chrome")
+  assertRunning(".*?Chrome")
 
   //Focus window with the specified title
-  focusWindow(".?*Chrome")
+  focusWindow(".*?Chrome")
   
   //All coordinates will be relative to the given window's position from here on.
   //Can be disabled with 'coordinateModeAbsolute()'
-  coordinateModeWindow(".?*Chrome")
+  coordinateModeWindow(".*?Chrome")
   
   //Move the mouse slooowly towards 0,0. Greater delay => slower movement.
   moveMouse(0,0,delay=1)
