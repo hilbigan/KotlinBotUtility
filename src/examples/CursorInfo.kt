@@ -1,9 +1,6 @@
 package examples
 
-import botutility.Bot
-import botutility.closeAllAlphaWindows
-import botutility.highlightArea
-import botutility.str
+import botutility.*
 import org.jnativehook.keyboard.NativeKeyEvent
 import java.awt.Point
 
@@ -23,7 +20,7 @@ fun main(args: Array<String>) {
     var pos2 = Point(0,0)
     var relative = false
 
-    with(Bot){
+    bot {
         onKeyPressed(NativeKeyEvent.VC_X){
             if(!relative) {
                 coordinateModeWindow(getActiveWindow())

@@ -441,6 +441,10 @@ object Bot {
     }
 }
 
+fun bot(block: Bot.() -> Unit){
+    block.invoke(Bot)
+}
+
 /*
  * Extension functions for java.awt.Point
  */
