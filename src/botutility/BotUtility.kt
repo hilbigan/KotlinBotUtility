@@ -412,7 +412,7 @@ object Bot {
      */
     fun assertRunning(titleRegex: String) {
         if (!isProgramRunning(titleRegex)) {
-            println("Process: $titleRegex not found, please start it first!")
+            println("Process '$titleRegex' not found, please start it first!")
             System.exit(1)
         }
     }
@@ -540,8 +540,6 @@ fun drawAlphaWindow(colArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int
             super.paintComponent(g)
             val g2d = g as Graphics2D
             g2d.color = Color(255, 0, 0, 128)
-            //g2d.fillRect(0, 0, width, height)
-            //g2d.drawString("HALLO",0,0)
             for (xx in 0 until w)
                 for (yy in 0 until h)
                     if (colArray[xx + yy * h] != 0) {
