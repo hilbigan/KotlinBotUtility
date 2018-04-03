@@ -10,7 +10,7 @@ regsvr32.exe AutoItX3.dll
 **Minimal Example:**
 ```kotlin
 fun main(args: Array<String>){
-  with(Bot){
+  bot {
     //Move the mouse to 0,0
     mouseMove(0,0)
   }
@@ -19,7 +19,7 @@ fun main(args: Array<String>){
 
 **Interacting with programs:**
 ```kotlin
-with(Bot){
+bot {
   //Checks if a program with the specified title (regex) is running and otherwise terminates
   assertRunning(".*?Chrome")
 
@@ -37,7 +37,7 @@ with(Bot){
 
 **Other cool stuff:**
 ```kotlin
-with(Bot){
+bot {
   onKeyPressed(NativeKeyEvent.VC_ENTER){ //Executes when 'Enter' is pressed
     //Left-Clicks on 150,150 every second until the pixel at 100,100 is red.
     untilPixelHasColor(100,100,Color(0xFF0000), threadStop = true){
