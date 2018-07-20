@@ -5,6 +5,7 @@ You need to either install AutoIt or download it's portable version and register
 ```
 regsvr32.exe AutoItX3.dll
 ```
+(or run the script [here](https://github.com/hilbigan/KotlinBotUtility/tree/master/src/install) as an administrator)
 
 
 **Minimal Example:**
