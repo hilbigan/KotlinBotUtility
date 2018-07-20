@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.io.File
 import java.lang.Math.abs
-import java.lang.Thread.interrupted
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
