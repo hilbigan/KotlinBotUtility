@@ -31,9 +31,23 @@ object Bot {
             AutoItX()
         }
     }
+
     private var coordinateModeWindow = false
     private var offsetWindowTitle: String? = null
+    private val screensize = lazy {
+        Toolkit.getDefaultToolkit().screenSize
+    }
+    private var wscale = 1.0
+    private var hscale = 1.0
     private var offset = Point(0, 0)
+
+    val screenWidth = lazy {
+        screensize.value.width
+    }
+
+    val screenHeight = lazy {
+        screensize.value.height
+    }
 
     init {
         robot.isAutoWaitForIdle = true
@@ -41,7 +55,23 @@ object Bot {
     }
 
     /**
-     * Sets the coordinate mode to "windowed".<br>
+     * Enables rescaling all points to fit the current resolution as if used on the given screen resolution.
+     *
+     * For example:
+     *
+     * setScalingFrom(1920, 1080);
+     * moveMouse(1920 / 2, 1080 / 2)
+     *
+     * will move the cursor to the center of the screen, no matter the screen resolution.
+     */
+    fun setScalingFrom(width: Int, height: Int){
+        wscale = screenWidth.value / width.toDouble()
+        hscale = screenHeight.value / height.toDouble()
+    }
+
+    /**
+     * Sets the coordinate mode to "windowed".
+     *
      * Every coordinate point will be offset relative to this window's position from this point on.
      */
     fun coordinateModeWindow(titleRegex: String, offsetFromWindow: Point = Point(0,0)) {
@@ -57,13 +87,21 @@ object Bot {
         coordinateModeWindow = false
     }
 
+    /*
+     * Private extension functions for Point
+     */
+
     private fun Point.coord(): Point {
-        if(coordinateModeWindow) {
+        return (if(coordinateModeWindow) {
             val pt = getPositionOfWindow(offsetWindowTitle!!)
-            return Point(pt.x + offset.x + this.x, pt.y + offset.y + this.y)
+            Point(pt.x + offset.x + this.x, pt.y + offset.y + this.y)
         } else {
-            return this
-        }
+            this
+        }).rescale()
+    }
+
+    private fun Point.rescale(): Point {
+        return Point((this.x * wscale).toInt(), (this.y * hscale).toInt())
     }
 
     private fun Point.dcoord(): Point {
@@ -555,18 +593,18 @@ fun highlightArea(x: Int, y: Int, w: Int, h: Int) {
 }
 
 private var drawnAlphaWindows: MutableList<JFrame> = mutableListOf()
-private val array = Array(1920 * 1080) { i -> 0xFF0000 }
+private val array = lazy {Array(1920 * 1080) { i -> 0xFF0000 }}
 
 /**
  * Display a transparent window with the given bounds. The colArray represents a lookup table for every pixel color in
  * the highlighted area.
  */
-fun drawAlphaWindow(colArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080, colalpha: Int = 128) {
+fun drawAlphaWindow(colArray: Array<Int> = array.value, x: Int = 0, y: Int = 0, w: Int = 1920, h: Int = 1080, colalpha: Int = 128) {
 
     assert(colArray.size == w * h)
 
     try {
-        val c = Class.forName("com.sun.awt.AWTUtilities");
+        Class.forName("com.sun.awt.AWTUtilities")
     } catch (e: Exception) {
         error("AlphaWindow not supported!")
     }
@@ -617,6 +655,7 @@ fun drawAlphaWindow(colArray: Array<Int> = array, x: Int = 0, y: Int = 0, w: Int
     fun wndclose() {
         frame.dispose()
     }
+
     panel.addMouseListener(object : MouseListener {
         override fun mouseReleased(e: MouseEvent?) {
             wndclose()
